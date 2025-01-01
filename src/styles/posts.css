@@ -1,0 +1,40 @@
+.postcontainer {
+  background-color: #ffffff;
+  margin-bottom: 20px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 8px;
+}
+.postHeader {
+  display: flex;
+  padding: 12px;
+  gap: 16px;
+  align-items: center;
+}
+
+.postUserPhoto {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.postHeaderLeft {
+  gap: 0;
+}
+
+.postHeaderUsername {
+  font-weight: 300;
+}
+.postHeaderDate {
+  font-weight: 300;
+  color: #3e3e3e;
+}
+.postMessage {
+  padding: 8px;
+  font-size: 24px;
+  font-weight: 600;
+}
+.postImage {
+  width: 100%;
+
+  margin: 0;
+}
