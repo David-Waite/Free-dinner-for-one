@@ -1,6 +1,6 @@
 .NavBarContainer {
-  position: sticky;
-  top: calc(100svh - 46px);
+  position: fixed;
+  bottom: 0;
   width: 100%;
   background-color: white;
   display: flex;

@@ -60,7 +60,7 @@ function LeaderboardPage() {
   console.log(ranking);
   return (
     <div className="container">
-      Leaderboard
+      Leaderboard test
       {ranking.map((person) => {
         return (
           <div>
