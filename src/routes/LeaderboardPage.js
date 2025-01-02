@@ -18,6 +18,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
+import { CalendarCheck, TrophyFill } from "react-bootstrap-icons";
 function LeaderboardPage() {
   const postCollection = collection(db, "posts");
   const [posts, setPosts] = useState([]);
@@ -42,29 +43,77 @@ function LeaderboardPage() {
 
     fetchPosts();
   }, []);
-
   useEffect(() => {
-    if (posts.length > 0) {
-      setRanking(() => {
-        return Object.entries(
+    const fetchUserData = async (userId) => {
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        return userDoc.data().photoURL || "default-profile-pic-url";
+      }
+      return "default-profile-pic-url"; // Return default photo if not found
+    };
+
+    const fetchRankingData = async () => {
+      if (posts.length > 0) {
+        const rankingData = Object.entries(
           posts.reduce((acc, post) => {
-            acc[post.username] = (acc[post.username] || 0) + 1;
+            acc[post.username] = acc[post.username] || {
+              count: 0,
+              userId: post.userId,
+            };
+            acc[post.username].count += 1;
             return acc;
           }, {})
         )
-          .map(([username, count]) => ({ username, count }))
+          .map(([username, { count, userId }]) => ({ username, count, userId }))
           .sort((a, b) => b.count - a.count);
-      });
-    }
-  }, [posts]);
+
+        let position = 1; // Start ranking at position 1
+        let prevCount = null;
+        let amountOfSame = 0;
+
+        // Fetch user photos for each user in the ranking data
+        const rankingWithPhotos = await Promise.all(
+          rankingData.map(async (item, index) => {
+            const photoURL = await fetchUserData(item.userId); // Fetch the user's photo
+            if (item.count !== prevCount) {
+              position = index + 1 - amountOfSame; // Update position only when count changes
+            } else {
+              amountOfSame++;
+            }
+            prevCount = item.count;
+            return { ...item, position, photoURL }; // Add position and photoURL to the object
+          })
+        );
+
+        setRanking(rankingWithPhotos);
+      }
+    };
+
+    fetchRankingData(); // Run the async function
+  }, [posts]); // Re-run this whenever posts change
+
   console.log(ranking);
   return (
     <div className="container">
-      Leaderboard test
-      {ranking.map((person) => {
+      <p className="leaderboardTitle">Current standings</p>
+      {ranking.map((person, index) => {
         return (
-          <div>
-            {person.username} {person.count}
+          <div key={person.username} className="leaderboard">
+            <div>
+              <p> {person.position}</p>
+              <img
+                src={person.photoURL}
+                alt="Profile"
+                className="postUserPhoto"
+              />
+              <p> {person.username}</p>
+              {person.position === 1 && <TrophyFill color="#fdd813" />}
+            </div>
+            <div>
+              {person.count}
+              <CalendarCheck />
+            </div>
           </div>
         );
       })}

@@ -1,0 +1,19 @@
+.leaderboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 24px;
+}
+
+.leaderboard div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leaderboardTitle {
+  text-align: center;
+  margin: 24px 0 48px;
+  font-size: 24px;
+  font-weight: 200;
+}
