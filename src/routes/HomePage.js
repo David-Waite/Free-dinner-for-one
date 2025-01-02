@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // Firebase Firestore configuration
@@ -15,6 +15,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
+import NavBar from "../components/NavBar";
 function HomePage() {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
@@ -22,6 +23,9 @@ function HomePage() {
   const auth = getAuth();
   const [posts, setPosts] = useState([]);
   const [createPost, setCreatePost] = useState(false);
+
+  const dialogRef = useRef();
+
   useEffect(() => {
     const fetchPosts = () => {
       const postCollection = collection(db, "posts");
@@ -67,7 +71,7 @@ function HomePage() {
     fetchUserData();
   }, [auth]);
   function toggleCreatePost() {
-    setCreatePost((createPost) => !createPost);
+    dialogRef.current?.showModal();
   }
   return (
     <div className="container">
@@ -75,12 +79,15 @@ function HomePage() {
       {error && <p>{error}</p>}
       {userData && (
         <>
-          <div className={"createPostBtn"}>
-            <p onClick={toggleCreatePost}>Post</p>
-          </div>
-          {createPost && (
-            <Postform userData={userData} toggleCreatePost={toggleCreatePost} />
-          )}
+          {/* <SetUp /> */}
+          <NavBar openPost={() => dialogRef.current?.showModal()} />
+          <dialog className="dialog" ref={dialogRef}>
+            <Postform
+              userData={userData}
+              toggleCreatePost={toggleCreatePost}
+              closeModal={() => dialogRef.current?.close()}
+            />
+          </dialog>
 
           {posts.map((post) => (
             <Post

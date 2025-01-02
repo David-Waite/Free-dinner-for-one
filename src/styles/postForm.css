@@ -12,16 +12,13 @@
   padding: 12px;
   font-size: 16px;
   width: calc(100% - 24px);
+  height: calc(100vw - 196px);
+  max-height: 254px;
 }
 .postFormCloseBtn {
+  cursor: pointer;
   height: 24px;
   width: 24px;
-  border-radius: 50%;
-  border: none;
-  background: black;
-  color: white;
-  font-size: 16px;
-  font-weight: 700;
   position: absolute;
   right: 12px;
   top: 0;

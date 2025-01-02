@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import { getAuth } from "firebase/auth";
-import { addDoc, collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase"; // Firebase setup
 import "../styles/postForm.css";
-function Postform({ userData, toggleCreatePost }) {
+import { XCircle } from "react-bootstrap-icons";
+function Postform({ userData, closeModal }) {
   const [message, setMessage] = useState(""); // Post message
   const [image, setImage] = useState(null); // Image file
   const [isUploading, setIsUploading] = useState(false);
@@ -102,12 +111,12 @@ function Postform({ userData, toggleCreatePost }) {
     <div className="postFormContainer">
       <div className="postFormContainerHeader">
         <h1 className="createPostTitle">Create post</h1>
-        <button onClick={toggleCreatePost} className="postFormCloseBtn">
+        <XCircle onClick={closeModal} className="postFormCloseBtn">
           X
-        </button>
+        </XCircle>
+        <div className="createPostLine"></div>
       </div>
 
-      <div className="createPostLine"></div>
       <div className="postHeader">
         <img src={userData.photoURL} alt="Profile" className="postUserPhoto" />
         <div className="postHeaderLeft">
