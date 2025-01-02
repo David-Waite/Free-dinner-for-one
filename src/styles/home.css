@@ -16,3 +16,15 @@
 .dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.808);
 }
+.loadMoreBtn {
+  border-radius: 50px;
+  padding: 8px;
+  margin-bottom: 72px;
+  width: 100%;
+  border: none;
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+}
