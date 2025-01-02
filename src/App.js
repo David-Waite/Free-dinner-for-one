@@ -6,6 +6,8 @@ import HomePage from "./routes/HomePage";
 import LoginPage from "./routes/LoginPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SignupPage from "./routes/SignupPage";
+import LeaderboardPage from "./routes/LeaderboardPage";
+import NavBar from "./components/NavBar";
 function App() {
   const [user, setUser] = useState(null);
 
@@ -31,6 +33,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute user={user}>
+              <LeaderboardPage />
+            </ProtectedRoute>
+          }
+        ></Route>
       </Routes>
     </Router>
   );
