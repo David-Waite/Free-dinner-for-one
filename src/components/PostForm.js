@@ -13,6 +13,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase"; // Firebase setup
 import "../styles/postForm.css";
 import { XCircle } from "react-bootstrap-icons";
+
 function Postform({ userData, closeModal }) {
   const [message, setMessage] = useState(""); // Post message
   const [image, setImage] = useState(null); // Image file
@@ -62,8 +63,11 @@ function Postform({ userData, closeModal }) {
         }
       }
 
-      // Upload image to Firebase Storage
-      const imageRef = ref(storage, `posts/${user.uid}/${image.name}`);
+      // Generate a unique file name based on the current date
+      const currentDate = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+      const uniqueName = `${currentDate}-${user.uid}-${image.name}`;
+      const imageRef = ref(storage, `posts/${user.uid}/${uniqueName}`);
+
       const uploadTask = uploadBytesResumable(imageRef, image);
 
       uploadTask.on(
