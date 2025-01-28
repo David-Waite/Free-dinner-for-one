@@ -8,39 +8,57 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import SignupPage from "./routes/SignupPage";
 import LeaderboardPage from "./routes/LeaderboardPage";
 import NavBar from "./components/NavBar";
+import "./App.css"; // Adjust the path as needed
+
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth(app);
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser); // Set the user object when the auth state changes
+      setUser(currentUser);
+      setLoading(false); // Loading is complete
     });
 
-    return () => unsubscribe(); // Cleanup the listener
+    return () => unsubscribe();
   }, []);
+
+  // if (loading) {
+  //   return <div>Loading...</div>; // Or a loading spinner
+  // }
 
   return (
     <Router>
+      {loading && (
+        <div className="loaderContainer">
+          <span className="loader"></span>
+        </div>
+      )}
+
       <Routes>
+        {!loading && (
+          <>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute user={user}>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/leaderboard"
+              element={
+                <ProtectedRoute user={user}>
+                  <LeaderboardPage />
+                </ProtectedRoute>
+              }
+            />
+          </>
+        )}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute user={user}>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/leaderboard"
-          element={
-            <ProtectedRoute user={user}>
-              <LeaderboardPage />
-            </ProtectedRoute>
-          }
-        ></Route>
       </Routes>
     </Router>
   );
