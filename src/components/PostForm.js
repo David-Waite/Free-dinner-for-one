@@ -14,12 +14,12 @@ import { db, storage } from "../firebase"; // Firebase setup
 import "../styles/postForm.css";
 import { XCircle } from "react-bootstrap-icons";
 
-function Postform({ userData, closeModal }) {
+function Postform({ userData, closeModal, fetchPosts }) {
   const [message, setMessage] = useState(""); // Post message
   const [image, setImage] = useState(null); // Image file
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
-  console.log(userData);
+
   const auth = getAuth();
   const user = auth.currentUser; // Get current user
 
@@ -99,6 +99,8 @@ function Postform({ userData, closeModal }) {
             setMessage(""); // Reset message
             setImage(null); // Reset image
             setIsUploading(false); // End uploading state
+            fetchPosts();
+            closeModal();
           } catch (error) {
             setUploadError("Error posting: " + error.message);
             setIsUploading(false);

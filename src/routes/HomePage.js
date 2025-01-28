@@ -53,30 +53,29 @@ function HomePage() {
 
     fetchUserData();
   }, [auth]);
+  const fetchPosts = async () => {
+    setLoading(true);
+    const postCollection = collection(db, "posts");
+    const postQuery = query(
+      postCollection,
+      orderBy("timestamp", "desc"),
+      limit(4)
+    );
+
+    const snapshot = await getDocs(postQuery);
+    const postsList = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    setPosts(postsList);
+
+    // Save the last visible post for pagination
+    setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      const postCollection = collection(db, "posts");
-      const postQuery = query(
-        postCollection,
-        orderBy("timestamp", "desc"),
-        limit(4)
-      );
-
-      const snapshot = await getDocs(postQuery);
-      const postsList = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-
-      setPosts(postsList);
-
-      // Save the last visible post for pagination
-      setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-      setLoading(false);
-    };
-
     fetchPosts();
   }, []);
 
@@ -120,6 +119,7 @@ function HomePage() {
             <Postform
               userData={userData}
               toggleCreatePost={toggleCreatePost}
+              fetchPosts={fetchPosts}
               closeModal={() => dialogRef.current?.close()}
             />
           </dialog>
