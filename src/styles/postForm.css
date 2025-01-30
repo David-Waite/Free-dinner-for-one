@@ -44,7 +44,7 @@
 .createPostPostBtn {
   cursor: pointer;
   color: white;
-  background-color: #6466ff;
+  /* background-color: #6466ff; */
 
   text-align: center;
   border: none;

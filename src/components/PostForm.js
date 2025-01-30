@@ -19,6 +19,7 @@ function Postform({ userData, closeModal, fetchPosts }) {
   const [image, setImage] = useState(null); // Image file
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [uploadingProgress, setUploadingProgress] = useState(0);
 
   const auth = getAuth();
   const user = auth.currentUser; // Get current user
@@ -76,6 +77,7 @@ function Postform({ userData, closeModal, fetchPosts }) {
           // Progress tracking (optional)
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadingProgress(progress);
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
@@ -100,7 +102,10 @@ function Postform({ userData, closeModal, fetchPosts }) {
             setImage(null); // Reset image
             setIsUploading(false); // End uploading state
             fetchPosts();
+
             closeModal();
+            setUploadingProgress(0);
+            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
           } catch (error) {
             setUploadError("Error posting: " + error.message);
             setIsUploading(false);
@@ -144,6 +149,9 @@ function Postform({ userData, closeModal, fetchPosts }) {
 
         <button
           className="createPostPostBtn"
+          style={{
+            background: `linear-gradient(90deg, rgba(75,181,67,1) ${uploadingProgress}%, rgba(100,102,255,1) ${uploadingProgress}%)`,
+          }}
           type="submit"
           disabled={isUploading}
         >
