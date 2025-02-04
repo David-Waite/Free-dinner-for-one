@@ -209,6 +209,7 @@ const Post = ({ message, timestamp, imageURL, userId, postId, reacts }) => {
           }`}
         >
           <EmojiPicker
+            searchDisabled={true}
             open={true}
             style={{ width: "100%", maxWidth: "450px" }}
             previewConfig={{ showPreview: false }}
