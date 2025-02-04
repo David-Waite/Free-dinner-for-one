@@ -74,7 +74,7 @@ function HomePage() {
     setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
     setLoading(false);
   };
-
+  console.log(posts);
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -132,6 +132,7 @@ function HomePage() {
               timestamp={post.timestamp}
               imageURL={post.imageUrl}
               userId={post.userId}
+              reacts={post.reacts}
             />
           ))}
 

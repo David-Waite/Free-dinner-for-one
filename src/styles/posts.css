@@ -38,3 +38,135 @@
 
   margin: 0;
 }
+.postFooter {
+  padding: 12px;
+}
+.postLikeNav {
+  display: flex;
+  /* align-items: center; */
+  justify-content: space-between;
+}
+.postLikeButtonsContainer {
+  display: flex;
+  gap: 12px;
+}
+.postChatBtn {
+  margin-top: -2px;
+}
+.postUsersReacts {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-left: 6px;
+}
+.postUserReactPhoto {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.postUserReactContainer {
+  position: relative;
+}
+.postUserReact {
+  font-size: 16px;
+  position: absolute;
+  left: -8px;
+  top: -4px;
+}
+
+.topComment {
+  margin-top: 4px;
+}
+.postReactPopUpContainer {
+  position: relative;
+}
+
+.postBlurBackground {
+  z-index: 2;
+  position: absolute;
+  width: 100%;
+  max-width: 450px;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(0);
+  opacity: 0; /* Initially hidden */
+  overflow: hidden;
+}
+
+/* Fade-in animation when opening */
+@keyframes fadeInBlur {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(5px);
+  }
+}
+@keyframes fadeOutBlur {
+  0% {
+    opacity: 1;
+    backdrop-filter: blur(5px);
+  }
+  100% {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+}
+.postBlurBackgroundOpen {
+  animation: fadeInBlur 0.3s ease-in-out forwards;
+}
+
+/* Smooth fade-out using transition */
+.postBlurBackgroundOpenClose {
+  animation: fadeOutBlur 0.3s ease-in-out forwards;
+}
+.emojiPicker {
+  position: fixed;
+  z-index: 4;
+  width: 100%;
+  max-width: 450px;
+  bottom: 0;
+  background-color: white;
+  height: 450px;
+}
+.emojiPickerOpen {
+  animation: moveIn 0.3s ease-in-out forwards;
+}
+.emojiPickerClose {
+  animation: moveOut 0.3s ease-in-out forwards;
+}
+
+@keyframes moveIn {
+  0% {
+    transform: translateY(450px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+@keyframes moveOut {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(450px);
+  }
+}
+
+.EmojiPickerReact .epr-header {
+  order: 2; /* Moves it to the bottom */
+}
+
+.EmojiPickerReact .epr-body {
+  order: 1; /* Moves the emojis above the category bar */
+  flex-grow: 1;
+}
+
+.EmojiPickerReact {
+  display: flex;
+  flex-direction: column;
+  height: 350px; /* Adjust the height as needed */
+}

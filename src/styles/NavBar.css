@@ -1,6 +1,7 @@
 .NavBarContainer {
   position: fixed;
   bottom: 0;
+  z-index: 2;
   width: 100%;
   max-width: 450px;
   background-color: white;

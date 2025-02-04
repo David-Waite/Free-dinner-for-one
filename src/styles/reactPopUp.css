@@ -1,0 +1,71 @@
+.reactPopUpContainer {
+  position: absolute;
+  z-index: 3;
+
+  left: -20px;
+  opacity: 0;
+  transform: scale(0);
+  top: -30px;
+  width: 0px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background-color: rgb(80, 80, 80);
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin: 0 8px;
+  border-radius: 60px;
+}
+.reactPopUpContainer button {
+  font-size: 30px;
+  background: transparent;
+  border: none;
+  transition: 0.1s;
+  cursor: pointer;
+  display: flex;
+}
+.reactPopUpContainer button:hover {
+  transform: scale(1.15);
+}
+
+.reactPopUpContainerOpen {
+  animation: PopIn 0.3s linear forwards;
+}
+.reactPopUpContainerClosed {
+  animation: PopOut 0.3s linear forwards;
+}
+
+@keyframes PopIn {
+  0% {
+    left: -20px;
+    opacity: 0;
+    transform: scale(0);
+    top: -30px;
+    width: 0px;
+  }
+  100% {
+    left: 0px;
+    transform: scale(1);
+    width: calc(100% - 16px);
+    top: -60px;
+    opacity: 1;
+  }
+}
+@keyframes PopOut {
+  0% {
+    left: 0px;
+    transform: scale(1);
+    width: calc(100% - 16px);
+    top: -60px;
+    opacity: 1;
+  }
+  100% {
+    left: -20px;
+    opacity: 0;
+    transform: scale(0);
+    top: -30px;
+    width: 0px;
+  }
+}
