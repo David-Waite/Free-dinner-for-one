@@ -96,6 +96,7 @@ function Postform({ userData, closeModal, fetchPosts }) {
               userId: user.uid,
               username: userData.username,
               imageUrl: imageUrl,
+              reacts: [],
             });
 
             setMessage(""); // Reset message

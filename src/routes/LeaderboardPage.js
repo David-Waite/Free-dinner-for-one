@@ -1,29 +1,28 @@
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import "../styles/leaderboard.css";
-import React, { useEffect, useRef, useState } from "react";
-import { getAuth } from "firebase/auth";
-import { doc, getDoc, getDocs } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+
 import { db } from "../firebase"; // Firebase Firestore configuration
-import Postform from "../components/PostForm";
-import Post from "../components/Post";
-import SetUp from "../components/SetUp";
+
 import "../styles/home.css";
 import {
-  collection,
-  query,
   orderBy,
   onSnapshot,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
+  collection,
+  query,
+  where,
+  count,
+  getAggregateFromServer,
 } from "firebase/firestore";
 import { CalendarCheck, TrophyFill } from "react-bootstrap-icons";
+import { useAppContext } from "../context/AppContext";
 function LeaderboardPage() {
-  const postCollection = collection(db, "posts");
   const [posts, setPosts] = useState([]);
   const [ranking, setRanking] = useState([]);
   const navigate = useNavigate();
+  const { allUsers } = useAppContext();
+  console.log(allUsers["ZzVnVv9UQ7OL2AuemZ3ZbmqbsAE2"]);
   useEffect(() => {
     const fetchPosts = () => {
       const postCollection = collection(db, "posts");
@@ -44,74 +43,67 @@ function LeaderboardPage() {
     fetchPosts();
   }, []);
   useEffect(() => {
-    const fetchUserData = async (userId) => {
-      const userRef = doc(db, "users", userId);
-      const userDoc = await getDoc(userRef);
-      if (userDoc.exists()) {
-        return userDoc.data().photoURL || "default-profile-pic-url";
-      }
-      return "default-profile-pic-url"; // Return default photo if not found
-    };
-
     const fetchRankingData = async () => {
-      if (posts.length > 0) {
-        const rankingData = Object.entries(
-          posts.reduce((acc, post) => {
-            acc[post.username] = acc[post.username] || {
-              count: 0,
-              userId: post.userId,
-            };
-            acc[post.username].count += 1;
-            return acc;
-          }, {})
-        )
-          .map(([username, { count, userId }]) => ({ username, count, userId }))
-          .sort((a, b) => b.count - a.count);
+      const userPostCounts = {}; // Store user post counts
 
-        let position = 1; // Start ranking at position 1
-        let prevCount = null;
-        let amountOfSame = 0;
+      const userIds = Object.keys(allUsers);
 
-        // Fetch user photos for each user in the ranking data
-        const rankingWithPhotos = await Promise.all(
-          rankingData.map(async (item, index) => {
-            const photoURL = await fetchUserData(item.userId); // Fetch the user's photo
-            if (item.count !== prevCount) {
-              position = index + 1 - amountOfSame; // Update position only when count changes
-            } else {
-              amountOfSame++;
-            }
-            prevCount = item.count;
-            return { ...item, position, photoURL }; // Add position and photoURL to the object
-          })
+      // Fetch post count for each user
+      for (const userId of userIds) {
+        const postsQuery = query(
+          collection(db, "posts"),
+          where("userId", "==", userId)
         );
-
-        setRanking(rankingWithPhotos);
+        const aggregateSnapshot = await getAggregateFromServer(postsQuery, {
+          postCount: count(),
+        });
+        userPostCounts[userId] = aggregateSnapshot.data().postCount;
       }
+
+      // Convert into ranking format and sort
+      const rankingData = Object.entries(userPostCounts)
+        .map(([userId, count]) => ({ userId, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Assign positions
+      let position = 1;
+      let prevCount = null;
+      let amountOfSame = 0;
+
+      const rankingWithPositions = rankingData.map((item, index) => {
+        if (item.count !== prevCount) {
+          position = index + 1 - amountOfSame;
+        } else {
+          amountOfSame++;
+        }
+        prevCount = item.count;
+        return { ...item, position };
+      });
+      setRanking(rankingWithPositions);
     };
 
     fetchRankingData(); // Run the async function
-  }, [posts]); // Re-run this whenever posts change
+  }, [allUsers]); // Re-run this whenever posts change
 
   console.log(ranking);
   return (
     <div className="container">
       <p className="leaderboardTitle">Current standings</p>
-      {ranking.map((person, index) => {
+      {ranking.map((user, index) => {
         return (
-          <div key={person.username} className="leaderboard">
+          <div key={user.userId} className="leaderboard">
             <div>
-              <p> {person.position}</p>
+              <p> {user.position}</p>
               <img
-                src={person.photoURL}
-                alt="Profile"
+                src={allUsers[user.userId].photoURL}
+                alt=""
                 className="postUserPhoto"
               />
-              <p> {person.username}</p>
-              {person.position === 1 && <TrophyFill color="#fdd813" />}
+              <p> {allUsers[user.userId].username}</p>
+              {user.position === 1 && <TrophyFill color="#fdd813" />}
             </div>
             <div>
-              {person.count}
+              {user.count}
               <CalendarCheck />
             </div>
           </div>

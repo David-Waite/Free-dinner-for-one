@@ -7,6 +7,7 @@ import LoginPage from "./routes/LoginPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SignupPage from "./routes/SignupPage";
 import LeaderboardPage from "./routes/LeaderboardPage";
+import { AppProvider } from "./context/AppContext";
 import NavBar from "./components/NavBar";
 import "./App.css"; // Adjust the path as needed
 
@@ -43,7 +44,9 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute user={user}>
-                  <HomePage />
+                  <AppProvider>
+                    <HomePage />
+                  </AppProvider>
                 </ProtectedRoute>
               }
             />
@@ -51,7 +54,9 @@ function App() {
               path="/leaderboard"
               element={
                 <ProtectedRoute user={user}>
-                  <LeaderboardPage />
+                  <AppProvider>
+                    <LeaderboardPage />
+                  </AppProvider>
                 </ProtectedRoute>
               }
             />

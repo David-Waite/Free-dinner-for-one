@@ -19,7 +19,7 @@ const ReactPopUp = ({
       <button onClick={() => handleQuickSelect("❤️")}>❤️</button>
       <button onClick={() => handleQuickSelect("👍")}>👍</button>
       <button onClick={() => handleQuickSelect("💪")}>💪</button>
-      <button onClick={() => handleQuickSelect("🔥❤️")}>🔥</button>
+      <button onClick={() => handleQuickSelect("🔥")}>🔥</button>
       <button onClick={() => handleQuickSelect("😰")}>😰</button>
       <button onClick={() => handleQuickSelect("😊")}>😊</button>
       <button>

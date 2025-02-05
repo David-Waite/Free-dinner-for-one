@@ -7,52 +7,24 @@ import {
   query,
   orderBy,
   limit,
-  onSnapshot,
   startAfter,
   getDocs,
 } from "firebase/firestore";
 import { db } from "../firebase"; // Firebase Firestore configuration
 import Postform from "../components/PostForm";
 import Post from "../components/Post";
-import SetUp from "../components/SetUp";
+
 import "../styles/home.css";
 import NavBar from "../components/NavBar";
-
+import { useAppContext } from "../context/AppContext";
 function HomePage() {
-  const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
   const [posts, setPosts] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [createPost, setCreatePost] = useState(false);
-
+  const { userData } = useAppContext();
   const dialogRef = useRef();
-  const auth = getAuth();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
-
-      if (user) {
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(userDocRef);
-
-          if (docSnap.exists()) {
-            setUserData(docSnap.data());
-          } else {
-            setError("User data not found");
-          }
-        } catch (err) {
-          setError("Failed to fetch user data");
-        }
-      } else {
-        setError("No user signed in");
-      }
-    };
-
-    fetchUserData();
-  }, [auth]);
   const fetchPosts = async () => {
     setLoading(true);
     const postCollection = collection(db, "posts");
@@ -74,7 +46,7 @@ function HomePage() {
     setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
     setLoading(false);
   };
-  console.log(posts);
+
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -110,7 +82,6 @@ function HomePage() {
 
   return (
     <div className="container">
-      {createPost && <div className="dimmer"></div>}
       {error && <p>{error}</p>}
       {userData && (
         <>
@@ -125,15 +96,7 @@ function HomePage() {
           </dialog>
 
           {posts.map((post) => (
-            <Post
-              key={post.id}
-              postId={post.id}
-              message={post.message}
-              timestamp={post.timestamp}
-              imageURL={post.imageUrl}
-              userId={post.userId}
-              reacts={post.reacts}
-            />
+            <Post key={post.id} postData={post} />
           ))}
 
           {/* Load More Button */}

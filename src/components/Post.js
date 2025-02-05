@@ -6,57 +6,86 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { Heart, Chat } from "react-bootstrap-icons";
+import { Heart, HeartFill, Chat } from "react-bootstrap-icons";
 import "../styles/posts.css";
 import ReactPopUp from "./ReactPopup";
 import EmojiPicker from "emoji-picker-react";
 import { getAuth } from "firebase/auth";
+import { useAppContext } from "../context/AppContext";
 const db = getFirestore();
-const Post = ({ message, timestamp, imageURL, userId, postId, reacts }) => {
-  const [userPhoto, setUserPhoto] = useState("");
-  const [username, setUsername] = useState("");
+const Post = ({ postData }) => {
+  const [reactions, setReactions] = useState([]);
 
   const [showDimmer, setShowDimmer] = useState(false);
   const [dimmerOpenAnimation, setDimmerOpenAnimation] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiPickerOpenAnimation, setEmojiPickerOpenAnimation] =
     useState(false);
-
   const [showReactPopUp, setShowReactPopUp] = useState(false);
   const [reactPopUpOpenAnimation, setReactPopUpOpenAnimation] = useState(true);
   const [pageHeight, setPageHeight] = useState(0);
-  const [reactionsWithPhotos, setReactionsWithPhotos] = useState([]);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userRef = doc(db, "users", userId);
-      const userDoc = await getDoc(userRef);
 
-      if (userDoc.exists()) {
-        setUserPhoto(userDoc.data().photoURL || "default-profile-pic-url");
-        setUsername(userDoc.data().username);
+  const { allUsers, userData } = useAppContext();
+
+  useEffect(() => {
+    setReactions(postData.reacts);
+  }, [postData.reacts]);
+
+  async function selectEmoji(data) {
+    const selectedEmoji = data?.emoji ? data.emoji : data;
+    const postRef = doc(db, "posts", postData.id);
+
+    try {
+      const postSnap = await getDoc(postRef);
+      if (!postSnap.exists()) {
+        console.log("Post not found");
+        return;
       }
-    };
 
-    fetchUserData();
-  }, [userId]);
+      const currentPostData = postSnap.data();
+      const currentReacts = currentPostData.reacts || [];
 
-  useEffect(() => {
-    async function fetchUserPhotos() {
-      const updatedReacts = await Promise.all(
-        reacts.map(async (react) => {
-          const userRef = doc(db, "users", react.userId);
-          const userSnap = await getDoc(userRef);
-          const photoURL = userSnap.exists() ? userSnap.data().photoURL : null;
-          return { ...react, photoURL };
-        })
+      // Remove existing reaction from the same user
+      const filteredReacts = currentReacts.filter(
+        (react) => react.userId !== userData.userId
       );
-      setReactionsWithPhotos(updatedReacts);
+
+      // Add new reaction (without animation flag for Firestore)
+      const newReaction = {
+        userId: userData.userId,
+        emoji: selectedEmoji,
+      };
+      const updatedReacts = [...filteredReacts, newReaction];
+
+      // Update Firestore
+      await updateDoc(postRef, { reacts: updatedReacts });
+
+      // Update local state with animation (local-only flag)
+      setReactions([
+        ...updatedReacts.map((react) => ({
+          ...react,
+          animation: react.userId === userData.userId, // Add animation only to the user's new reaction
+        })),
+      ]);
+
+      // Remove animation after 1 second
+      setTimeout(() => {
+        setReactions((prevReactions) =>
+          prevReactions.map((reaction) => ({
+            ...reaction,
+            animation: false, // Remove animation flag locally
+          }))
+        );
+      }, 1000);
+
+      console.log("Reaction updated successfully!");
+    } catch (error) {
+      console.error("Error updating reaction:", error);
     }
 
-    if (reacts.length > 0) {
-      fetchUserPhotos();
-    }
-  }, [reacts]);
+    closeDimmer();
+  }
+
   useEffect(() => {
     if (showDimmer) {
       document.body.style.overflow = "hidden"; // Disable scroll
@@ -137,59 +166,6 @@ const Post = ({ message, timestamp, imageURL, userId, postId, reacts }) => {
       setShowDimmer(false);
     }, 300);
   }
-  console.log(reacts);
-  async function selectEmoji(data) {
-    const auth = getAuth();
-    const userId = auth.currentUser?.uid; // Get the authenticated user ID
-    const selectedEmoji = data?.emoji ? data.emoji : data;
-
-    if (!userId) {
-      console.log("User not authenticated");
-      return;
-    }
-
-    const postRef = doc(db, "posts", postId);
-
-    try {
-      const postSnap = await getDoc(postRef);
-      if (!postSnap.exists()) {
-        console.log("Post not found");
-        return;
-      }
-
-      const postData = postSnap.data();
-      const currentReacts = postData.reacts || [];
-
-      // Remove existing reaction from the same user
-      const filteredReacts = currentReacts.filter(
-        (react) => react.userId !== userId
-      );
-
-      // Add new reaction
-      const newReaction = { userId, emoji: selectedEmoji };
-      filteredReacts.push(newReaction);
-
-      // Update Firestore
-      await updateDoc(postRef, { reacts: filteredReacts });
-
-      // 🔹 Update local state immediately
-      setReactionsWithPhotos((prevReactions) => {
-        const filteredLocalReacts = prevReactions.filter(
-          (react) => react.userId !== userId
-        );
-        return [
-          ...filteredLocalReacts,
-          { ...newReaction, photoURL: userPhoto },
-        ];
-      });
-
-      console.log("Reaction updated successfully!");
-    } catch (error) {
-      console.error("Error updating reaction:", error);
-    }
-
-    closeDimmer();
-  }
 
   return (
     <div className="postcontainer">
@@ -222,17 +198,21 @@ const Post = ({ message, timestamp, imageURL, userId, postId, reacts }) => {
 
       {/* User Profile and Post Header */}
       <div className="postHeader">
-        <img src={userPhoto} alt="Profile" className="postUserPhoto" />
+        <img
+          src={allUsers[postData.userId].photoURL}
+          alt=""
+          className="postUserPhoto"
+        />
         <div className="postHeaderLeft">
-          <h3 className="postHeaderUsername">{username}</h3>
-          <p className="postHeaderDate">{formatDate(timestamp)}</p>
+          <h3 className="postHeaderUsername">{postData.username}</h3>
+          <p className="postHeaderDate">{formatDate(postData.timestamp)}</p>
         </div>
       </div>
       {/* Post Content */}
-      <p className="postMessage">{message}</p>
+      <p className="postMessage">{postData.message}</p>
       {/* Post Image */}
-      {imageURL && (
-        <img src={imageURL} alt="Post" width={300} className="postImage" />
+      {postData.imageUrl && (
+        <img src={postData.imageUrl} alt="Post" className="postImage" />
       )}
 
       {showReactPopUp && (
@@ -248,17 +228,29 @@ const Post = ({ message, timestamp, imageURL, userId, postId, reacts }) => {
       <div className="postFooter">
         <div className="postLikeNav">
           <div className="postLikeButtonsContainer">
-            <Heart size={20} onClick={openReactPopUp} />
+            {reactions.some(
+              (reaction) => reaction.userId === userData.userId
+            ) ? (
+              <HeartFill color="red" size={20} onClick={openReactPopUp} />
+            ) : (
+              <Heart size={20} onClick={openReactPopUp} />
+            )}
+
             {/* <Chat className="postChatBtn" size={20} /> */}
           </div>
           {/* <p>2 Comments</p> */}
         </div>
         <div className="postUsersReacts">
-          {reactionsWithPhotos.map((react, index) => (
-            <div key={index} className="postUserReactContainer">
+          {reactions.map((react, index) => (
+            <div
+              key={index}
+              className={`postUserReactContainer ${
+                react.animation ? "newReactAnimation" : ""
+              }`}
+            >
               <img
-                src={react.photoURL || "/default-profile.png"} // Fallback image
-                alt="Profile"
+                src={allUsers[react.userId].photoURL || "/default-profile.png"}
+                alt=""
                 className="postUserReactPhoto"
               />
               <span className="postUserReact">{react.emoji}</span>
