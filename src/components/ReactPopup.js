@@ -18,10 +18,10 @@ const ReactPopUp = ({
     >
       <button onClick={() => handleQuickSelect("❤️")}>❤️</button>
       <button onClick={() => handleQuickSelect("👍")}>👍</button>
-      <button onClick={() => handleQuickSelect("💪")}>💪</button>
-      <button onClick={() => handleQuickSelect("🔥")}>🔥</button>
-      <button onClick={() => handleQuickSelect("😰")}>😰</button>
-      <button onClick={() => handleQuickSelect("😊")}>😊</button>
+      <button onClick={() => handleQuickSelect("🦧")}>🦧</button>
+      <button onClick={() => handleQuickSelect("💉")}>💉</button>
+      <button onClick={() => handleQuickSelect("🥗")}>🥗</button>
+      <button onClick={() => handleQuickSelect("😎")}>😎</button>
       <button>
         <PlusCircleFill onClick={openEmojiPicker} fontSize={30} color="white" />
       </button>
