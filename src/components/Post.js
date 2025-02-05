@@ -66,14 +66,16 @@ const Post = ({ message, timestamp, imageURL, userId, postId, reacts }) => {
   }, [showDimmer]);
 
   const formatDate = (timestamp) => {
-    const date = new Date(timestamp.seconds * 600);
+    const date = new Date(timestamp.seconds * 1000);
+
     return new Intl.DateTimeFormat("en-AU", {
-      month: "2-digit",
       day: "2-digit",
+      month: "2-digit",
       year: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: true, // 12-hour format
+      hour12: true,
+      timeZone: "Australia/Sydney",
     }).format(date);
   };
 
