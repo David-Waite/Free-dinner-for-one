@@ -12,8 +12,9 @@ import ReactPopUp from "./ReactPopup";
 import EmojiPicker from "emoji-picker-react";
 import { getAuth } from "firebase/auth";
 import { useAppContext } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
 const db = getFirestore();
-const Post = ({ postData }) => {
+const Post = ({ postData, commentsPage }) => {
   const [reactions, setReactions] = useState([]);
 
   const [showDimmer, setShowDimmer] = useState(false);
@@ -26,6 +27,7 @@ const Post = ({ postData }) => {
   const [pageHeight, setPageHeight] = useState(0);
 
   const { allUsers, userData } = useAppContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setReactions(postData.reacts);
@@ -168,7 +170,7 @@ const Post = ({ postData }) => {
   }
 
   return (
-    <div className="postcontainer">
+    <div className={`postcontainer ${!commentsPage && "postcontainerHome"}`}>
       {showDimmer && (
         <div
           onClick={closeDimmer}
@@ -231,14 +233,24 @@ const Post = ({ postData }) => {
             {reactions.some(
               (reaction) => reaction.userId === userData.userId
             ) ? (
-              <HeartFill color="red" size={20} onClick={openReactPopUp} />
+              <HeartFill
+                color="red"
+                size={20}
+                onClick={openReactPopUp}
+                className="cursor"
+              />
             ) : (
-              <Heart size={20} onClick={openReactPopUp} />
+              <Heart size={20} onClick={openReactPopUp} className="cursor" />
             )}
-
-            {/* <Chat className="postChatBtn" size={20} /> */}
+            {!commentsPage && (
+              <Chat
+                className="postChatBtn cursor"
+                size={20}
+                onClick={() => navigate("/comments", { state: { postData } })}
+              />
+            )}
           </div>
-          {/* <p>2 Comments</p> */}
+          <p>{postData.comments.length} Comments</p>
         </div>
         <div className="postUsersReacts">
           {reactions.map((react, index) => (
@@ -257,15 +269,14 @@ const Post = ({ postData }) => {
             </div>
           ))}
         </div>
-        {/* <div className="topComment">
-          <p>
-            <strong>Luke</strong> The HTML element defines text with strong
-            importance. The content inside is typically displayed in bold.
-            Example. This text is important! The HTML element defines text with
-            strong importance. The content inside is typically displayed in
-            bold. Example. This text is important!
-          </p>
-        </div> */}
+        {!commentsPage && postData.comments[0] && (
+          <div className="topComment">
+            <p>
+              <strong>{postData.comments[0].username} </strong>
+              {postData.comments[0].comment}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -27,7 +27,6 @@ export const AppProvider = ({ children }) => {
 
       usersSnap.forEach((doc) => {
         const userData = doc.data();
-        console.log(userData);
         usersData[doc.id] = {
           photoURL: userData.photoURL || "/default-profile.png",
           username: userData.username || "Unknown User",

@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "./firebase"; // Firebase initialization
 import HomePage from "./routes/HomePage";
@@ -8,7 +14,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import SignupPage from "./routes/SignupPage";
 import LeaderboardPage from "./routes/LeaderboardPage";
 import { AppProvider } from "./context/AppContext";
-import NavBar from "./components/NavBar";
+import PostCommentPage from "./routes/PostCommentPage";
 import "./App.css"; // Adjust the path as needed
 
 function App() {
@@ -25,18 +31,14 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // if (loading) {
-  //   return <div>Loading...</div>; // Or a loading spinner
-  // }
-
   return (
     <Router>
+      <AutoRedirect />
       {loading && (
         <div className="loaderContainer">
           <span className="loader"></span>
         </div>
       )}
-
       <Routes>
         {!loading && (
           <>
@@ -60,6 +62,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/comments"
+              element={
+                <ProtectedRoute user={user}>
+                  <AppProvider>
+                    <PostCommentPage />
+                  </AppProvider>
+                </ProtectedRoute>
+              }
+            />
           </>
         )}
         <Route path="/login" element={<LoginPage />} />
@@ -67,6 +79,20 @@ function App() {
       </Routes>
     </Router>
   );
+}
+
+// AutoRedirect Component to handle refresh redirects
+function AutoRedirect() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      navigate("/");
+    }
+  }, []);
+
+  return null; // This component does not render anything
 }
 
 export default App;
