@@ -27,7 +27,7 @@
   margin-bottom: 60px;
   background-color: white;
   max-width: 450px;
-  margin: 48px auto 0px auto;
+  margin: 48px auto 42px auto;
   min-height: calc(100svh);
 }
 .commentInputContainer {

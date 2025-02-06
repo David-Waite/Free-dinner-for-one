@@ -91,9 +91,9 @@ const PostCommentPage = () => {
                 style={{
                   marginBottom:
                     index === currentComments.length - 1 && index !== 0
-                      ? "60px"
+                      ? "24px"
                       : index === currentComments.length - 1 && index === 0
-                      ? "60px"
+                      ? "24px"
                       : "0px",
                 }}
               >
