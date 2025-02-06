@@ -29,7 +29,7 @@ const PostCommentPage = () => {
     }
   }, [currentComments]);
   const post = location.state?.postData; // Retrieve the passed post data
-  console.log(post.comments);
+
   if (!post) {
     return <p>Post not found!</p>; // Handle case where no data is passed
   }
@@ -56,7 +56,9 @@ const PostCommentPage = () => {
       });
 
       console.log("Comment added successfully");
-      setCurrentComments((prev) => [...prev, newCommentObj]);
+      setCurrentComments((prev) =>
+        prev ? [...prev, newCommentObj] : [newCommentObj]
+      );
 
       // Clear input field after submission
       setNewComment("");
@@ -79,8 +81,8 @@ const PostCommentPage = () => {
       </div>
       <Post postData={post} commentsPage={true} />
       <div className="commentsContainer" ref={firstCommentRef}>
-        {currentComments.length > 0 &&
-          currentComments.map((comment, index) => {
+        {currentComments?.length > 0 &&
+          currentComments?.map((comment, index) => {
             return (
               <div
                 key={index}

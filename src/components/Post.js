@@ -250,7 +250,7 @@ const Post = ({ postData, commentsPage }) => {
               />
             )}
           </div>
-          <p>{postData.comments.length} Comments</p>
+          <p>{postData.comments ? postData.comments.length : 0} Comments</p>
         </div>
         <div className="postUsersReacts">
           {reactions.map((react, index) => (
@@ -269,11 +269,12 @@ const Post = ({ postData, commentsPage }) => {
             </div>
           ))}
         </div>
-        {!commentsPage && postData.comments[0] && (
+
+        {!commentsPage && postData.comments?.length > 0 && (
           <div className="topComment">
             <p>
-              <strong>{postData.comments[0].username} </strong>
-              {postData.comments[0].comment}
+              <strong>{postData.comments[0]?.username} </strong>
+              {postData.comments[0]?.comment}
             </p>
           </div>
         )}
